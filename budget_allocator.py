@@ -32,6 +32,10 @@ xtol_rel=1e-10
 
 past_weeks=int(st.sidebar.text_input("How many weeks in the past do you want to go?", value=4))
 
+st.sidebar.write('select the percentage of how much freedom you want to give to your upper and lower bounds')
+upper_constraint= float(st.sidebar.slider("Select the upper constraint", 100, 250, 150))/100
+lower_constraint= float(st.sidebar.slider("Select the lower constraint", 0, 100, 50))/100
+
 
 transactions=df['transactions'].iloc[-past_weeks]
 spends=df[paid_media].tail(past_weeks)
@@ -45,8 +49,8 @@ if st.button(f"click to see how many more conversions you would've generate if y
         spend= np.array(row)
         tot_spend=spend.sum()
         investments.append(tot_spend)
-        lb = spend*0.1
-        ub=spend*2
+        lb = spend*lower_constraint
+        ub=spend*upper_constraint
         maxeval=30000
         expected_spend=float(st.sidebar.text_input('expected_spend', value=spend.sum()+10))
 
@@ -66,7 +70,7 @@ if st.button(f"click to see how many more conversions you would've generate if y
     new_transactions=df2['new_transactions'].sum()
     old_transactions=df2['old_transactions'].sum()
     #concatenated_df = pd.concat([df, df2]).fillna(value=0)
-    st.write(sum(investments))
+    st.write(f'the total budget invested is {sum(investments)}€')
     st.line_chart(df2)
     st.write(f'total new transactions {abs(new_transactions)}')
     st.write(f'total new investments {(sum(investments))}')
